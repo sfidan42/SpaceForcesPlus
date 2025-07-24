@@ -1,0 +1,8 @@
+**/build/
+**/.settings/
+*.project
+*.cproject
+**/_build/
+.DS_Store
+.swp
+.idea
