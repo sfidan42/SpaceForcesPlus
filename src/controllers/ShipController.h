@@ -48,12 +48,13 @@ private:
 	Object2D<Type2D::VECTOR, Pos2D::MOVING, Tex2D::SPRITE>* movableships = nullptr;
 	Object2D<Type2D::INTERFACE, Pos2D::MOVING, Tex2D::SPRITE>* selectedship = nullptr;
 
-	Object2D<Type2D::VECTOR, Pos2D::MOVING, Tex2D::IMAGE>* bullets;
-	gImage bulletframe;
+	Object2D<Type2D::VECTOR, Pos2D::MOVING, Tex2D::IMAGE>* bullets = nullptr;
+	Frame bulletframe;
 
-	SpriteAnimator *animator = nullptr;
+	AnimationFrames selectionframes;
+	SpriteAnimator selectionanimator;
 
-	gFont* font;
+	gFont* font = nullptr;
 };
 
 #endif /* SRC_CONTROLLERS_SHIPCONTROLLER_H_ */

@@ -8,16 +8,14 @@ PlatformController::PlatformController(const std::string& path, std::initializer
 	: selectedplatform(nullptr) {
 	platforms = new Object2D<Type2D::VECTOR, Pos2D::FIXED, Tex2D::IMAGE>();
 	size_t index = 0;
+	Frame frame = loadFrame(path);
+	if (frame.frame == nullptr) {
+		gLogw("PlatformController::PlatformController") << "Failed to load platform image from: " << path;
+		return;
+	}
+	platforms->addTexture(std::move(frame));
 	for (const auto& pos : positions) {
-		auto* texture = new gImage();
-		if (!texture->loadImage(path)) {
-			gLoge("PlatformController::PlatformController") << "Failed to load platform image from: " << path;
-			delete texture;
-			break;
-		}
-		platforms->addTexture(texture);
-		platforms->addObject2D(index, pos, angle, platformSize, 1.0f);
-		index++;
+		platforms->addObject2D(0, pos, angle, platformSize, 1.0f);
 	}
 }
 

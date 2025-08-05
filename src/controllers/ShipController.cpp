@@ -11,53 +11,32 @@
 
 ShipController::ShipController() {
 	fixedships = new Object2D<Type2D::VECTOR, Pos2D::FIXED, Tex2D::SPRITE>;
-	for(int i = 1; i <= 4; ++i) {
-		auto* texture = new AnimationFrames();
-		for(int j = 1; ; ++j) {
-			std::string path = "gemiler/ship_" + gToStr(i) + "/ship_" + gToStr(i) + "_" + gToStr(j) + ".png";
-			auto* img = new gImage();
-			if (!gFile::doesFileExist(gFile::gGetImagesDir() + path) || !img->loadImage(path)) {
-				gLogw("ShipController::ShipController") << "No more frames found for: " << path;
-				delete img;
-				break;
-			}
-			texture->frames.push_back(img);
-		}
-		fixedships->addTexture(texture);
-	}
+	fixedships->addTexture("gemiler/ship_1/ship_1_%d.png", 1, 25);
+	fixedships->addTexture("gemiler/ship_2/ship_2_%d.png", 1, 16);
+	fixedships->addTexture("gemiler/ship_3/ship_3_%d.png", 1, 25);
+	fixedships->addTexture("gemiler/ship_4/ship_4_%d.png", 1, 25);
 	fixedships->addObject2D(0, {60, 20}, 0.0f, {242, 239});
 	fixedships->addObject2D(1, {90, 310}, 0.0f, {170, 193});
 	fixedships->addObject2D(2, {47, 557},0.0f, {255, 250});
 	fixedships->addObject2D(3, {110, 900}, 0.0f, {130, 97});
 	movableships = new Object2D<Type2D::VECTOR, Pos2D::MOVING, Tex2D::SPRITE>();
-	animator = new SpriteAnimator();
 	bullets = new Object2D<Type2D::VECTOR, Pos2D::MOVING, Tex2D::IMAGE>;
-	const std::string bulletPath = "oyuncu_bullet_1_04.png";
-	if(!bulletframe.loadImage(bulletPath)) {
+	const std::string bulletPath = "human_bullet.png";
+	bulletframe = loadFrame(bulletPath);
+	if(bulletframe.frame == nullptr) {
 		gLoge("ShipController::ShipController") << "Failed to load bullet frame from: " << bulletPath;
+		return;
 	}
-	auto *animatedFrames = new AnimationFrames();
-	const std::string& baseDir = gObject::gGetImagesDir();
-	for(int i = 1; ; i++) {
-		std::string path = "platform_anim/platform_" + gToStr(i) + ".png";
-		if(gFile::doesFileExist(baseDir + path)) {
-			auto* img = new gImage();
-			img->loadImage(path);
-			animatedFrames->frames.push_back(img);
-		} else {
-			break;
-		}
-	}
-	auto* selectionAnim = new SpriteAnimation(animatedFrames, 25);
-	animator->addAnimation(selectionAnim);
-	animator->changeAnimation(selectionAnim->getId());
+	selectionframes = loadAnimationFrames("platform_anim/platform_%d.png", 0, 24);
+	auto* selectionAnimation = new SpriteAnimation(&selectionframes, 25);
+	selectionanimator.addAnimation(selectionAnimation);
+	selectionanimator.changeAnimation(selectionAnimation->getId());
 	font = new gFont();
 }
 
 ShipController::~ShipController() {
 	delete fixedships;
 	delete movableships;
-	delete animator;
 	delete bullets;
 	delete font;
 }
@@ -75,7 +54,7 @@ void ShipController::FPressed() {
 		const glm::vec2 shipSpeed = selectedship->getSpeed();
 		const glm::vec2 normShipSpeed = glm::length(shipSpeed) <= 0.01f ? glm::vec2(0.0f) : glm::normalize(shipSpeed);
 		const glm::vec2 bulletSpeed = direction * 1000.0f + normShipSpeed * 333.333f;
-		const glm::vec2 bulletFrameSize = glm::vec2(bulletframe.getWidth(), bulletframe.getHeight());
+		const glm::vec2 bulletFrameSize = glm::vec2(bulletframe.frame->getWidth(), bulletframe.frame->getHeight());
 
 		const glm::vec2 spawnPos = selectedship->getMidPosition() + direction * shipRadius - bulletFrameSize * 0.5f;
 
@@ -101,7 +80,7 @@ void ShipController::GPressed() {
 		const glm::vec2 shipSpeed = selectedship->getSpeed();
 		const glm::vec2 normShipSpeed = glm::length(shipSpeed) <= 0.01f ? glm::vec2(0.0f) : glm::normalize(shipSpeed);
 		const glm::vec2 bulletSpeed = direction * 100.0f + normShipSpeed * 33.333f;
-		const glm::vec2 bulletFrameSize = glm::vec2(bulletframe.getWidth(), bulletframe.getHeight());
+		const glm::vec2 bulletFrameSize = glm::vec2(bulletframe.frame->getWidth(), bulletframe.frame->getHeight());
 
 		glm::vec2 spawnPos = selectedship->getMidPosition() + direction * shipRadius - bulletFrameSize * 0.5f;
 
@@ -167,20 +146,20 @@ void ShipController::setup(const glm::vec2& minBoundary, const glm::vec2& maxBou
 
 void ShipController::update(float deltaTime) {
 	movableships->update(deltaTime);
-	animator->update(deltaTime);
+	selectionanimator.update(deltaTime);
 	bullets->update(deltaTime);
 }
 
 void ShipController::draw() const {
 	if(selectedship) {
-		const gImage* curFrame = animator->getCurrentFrame();
+		const gImage* curFrame = selectionanimator.getCurrentFrame();
 		glm::vec2 curPos = selectedship->getMidPosition();
 		glm::vec2 curFrameSize {
 			static_cast<float>(curFrame->getWidth()),
 			static_cast<float>(curFrame->getHeight())
 		};
 		curPos -= curFrameSize * 0.5f;
-		animator->draw(curPos, curFrameSize, 30.0f);
+		selectionanimator.draw(curPos, curFrameSize, 30.0f);
 	}
 	bullets->draw();
 	fixedships->draw();
