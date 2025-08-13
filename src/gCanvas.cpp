@@ -41,7 +41,7 @@ void gCanvas::update() {
 void gCanvas::draw() {
 	background.draw(0, 0);
 	gamecontroller->draw();
-	font->drawText("fps: " + gToStr(1.0f / appmanager->getElapsedTime()), 0.0f, 16.0f);
+	font->drawText("fps: " + gToStr(appmanager->getFramerate()), 0.0f, 16.0f);
 }
 
 void gCanvas::keyPressed(int key) {

@@ -43,8 +43,8 @@ ShipController::~ShipController() {
 
 void ShipController::FPressed() {
 	if (selectedship) {
-		const float bulletDrawAngle = selectedship->getAngle();
-		const float bulletSpeedAngle = bulletDrawAngle + 90.0f;
+		const float bulletDrawAngle = selectedship->getAngle() - 90.0f;
+		const float bulletSpeedAngle = bulletDrawAngle + 180.0f;
 
 		const glm::vec2 direction = glm::rotate(glm::vec2(1.0f, 0.0f), glm::radians(bulletSpeedAngle));
 
@@ -69,8 +69,8 @@ void ShipController::FPressed() {
 
 void ShipController::GPressed() {
 	if (selectedship) {
-		const float bulletDrawAngle = selectedship->getAngle();
-		const float bulletSpeedAngle = bulletDrawAngle + 90.0f;
+		const float bulletDrawAngle = selectedship->getAngle() - 90.0f;
+		const float bulletSpeedAngle = bulletDrawAngle + 180.0f;
 
 		const glm::vec2 direction = glm::rotate(glm::vec2(1.0f, 0.0f), glm::radians(bulletSpeedAngle));
 
@@ -105,9 +105,11 @@ void ShipController::mouseLeftRelease(const glm::vec2& clickedPos) {
 	auto movableIt = movableships->selectObject2D(clickedPos);
 	if (movableIt != movableships->end()) {
 		selectedship = *movableIt;
+		/*
 		gLogi("ShipController::mouseLeftRelease")
 			<< "Selected movable ship with id " << selectedship->getId()
 			<< " at position: " << clickedPos.x << ", " << clickedPos.y;
+		*/
 		selectedship->setSpeed(speed);
 		return;
 	}
@@ -117,9 +119,11 @@ void ShipController::mouseLeftRelease(const glm::vec2& clickedPos) {
 		auto* movingShipCopy = new Object2D<Type2D::NODE, Pos2D::MOVING, Tex2D::SPRITE>(**fixedIt);
 		movableships->push_back(movingShipCopy);
 		selectedship = movingShipCopy;
+		/*
 		gLogi("ShipController::mouseLeftRelease")
 			<< "Selected fixed ship with id " << selectedship->getId()
 			<< " at position: " << clickedPos.x << ", " << clickedPos.y;
+		*/
 		selectedship->setSpeed(speed);
 	}
 }
